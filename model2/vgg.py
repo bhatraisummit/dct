@@ -17,7 +17,7 @@ class VGG(nn.Module):
     def __init__(self, vgg_name):
         super(VGG, self).__init__()
         self.features = self._make_layers(cfg[vgg_name])
-        self.classifier = nn.Linear(512, 88)
+        self.classifier = nn.Linear(512, 87)
 
     def forward(self, x):
         out = self.features(x)
@@ -46,7 +46,7 @@ class VGG_ATT(nn.Module):
         self.mode = mode
 
         self.features = self._make_layers(cfg['VGG_ATT'])
-        self.classifier = nn.Linear(512, 88)
+        self.classifier = nn.Linear(512, 87)
 
         self.l1 = nn.Sequential(*list(self.features)[:22])
         self.l2 = nn.Sequential(*list(self.features)[22:32])
@@ -64,7 +64,7 @@ class VGG_ATT(nn.Module):
         self.fc1_l2 = nn.Linear(512, 512)
         self.fc1_l3 = nn.Linear(512, 512)
 
-        self.fc2 = nn.Linear(256 + 512 + 512, 88)
+        self.fc2 = nn.Linear(256 + 512 + 512, 87)
 
     def forward(self, x):
         l1 = self.l1(x)
