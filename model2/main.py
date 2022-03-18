@@ -51,8 +51,8 @@ class NWPUDataset(torch.utils.data.Dataset):
 # Data
 print('==> Preparing data..')
 
-#data_path = '/scratch/s571b087/project/Lensless_Imaging/rice_face/demosaiced_measurement'
-data_path ='/home/s571b087/lensless/project/rice_face/demosaiced_measurement'
+# data_path = '/scratch/s571b087/project/Lensless_Imaging/rice_face/demosaiced_measurement'
+data_path = '/home/s571b087/lensless/project/rice_face/demosaiced_measurement'
 
 im_size = 32
 train_split = 0.7
@@ -97,7 +97,6 @@ else:
     print('==> Building model..')
     net = VGG_ATT(mode='dp')
 
-
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 net = torch.nn.DataParallel(net, device_ids=list(range(torch.cuda.device_count()))).to(device)
 cudnn.benchmark = True
@@ -116,6 +115,7 @@ def train(epoch):
     train_loss = 0
     correct = 0
     total = 0
+    accuracy = 0
     for batch_idx, (inputs, targets) in enumerate(trainloader):
         inputs, targets = inputs.to(device), targets.to(device)
         optimizer.zero_grad()
@@ -129,11 +129,11 @@ def train(epoch):
         total += targets.size(0)
         correct += predicted.eq(targets.data).cpu().sum()
         accuracy = 100. * correct / total
-        writer.add_scalar('train/loss', loss.item())
-        writer.add_scalar('train/accuracy', accuracy)
 
         progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                      % (train_loss / (batch_idx + 1), 100. * correct / total, correct, total))
+    writer.add_scalar('train/loss', train_loss, epoch)
+    writer.add_scalar('train/accuracy', accuracy, epoch)
     scheduler.step()
 
 
@@ -144,6 +144,8 @@ def test(epoch):
     test_loss = 0
     correct = 0
     total = 0
+    acc = 0
+    loss = 0
     for batch_idx, (inputs, targets) in enumerate(testloader):
         inputs, targets = inputs.to(device), targets.to(device)
         outputs = net(inputs)
@@ -153,13 +155,16 @@ def test(epoch):
         _, predicted = torch.max(outputs.data, 1)
         total += targets.size(0)
         correct += predicted.eq(targets.data).cpu().sum()
-
+        loss = test_loss / (batch_idx + 1)
+        acc = 100. * correct / total
         progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
-            % (test_loss/(batch_idx+1), 100.*correct/total, correct, total))
+                     % (test_loss / (batch_idx + 1), 100. * correct / total, correct, total))
+    writer.add_scalar('test/accuracy', acc, epoch)
+    writer.add_scalar('test/loss', loss, epoch)
 
     # Save checkpoint.
     acc = 100. * correct / total
-    writer.add_scalar('test/accuracy', acc, epoch)
+
     if acc > best_acc:
         print('Saving..')
         state = {
