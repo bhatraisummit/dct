@@ -68,7 +68,8 @@ def testmain():
 
 def main():
     ## load data
-    data_path = 'datapath'
+    data_path = '/scratch/s571b087/project/Lensless_Imaging/rice_face/demosaiced_measurement'
+    #data_path = '/home/s571b087/lensless/project/rice_face/demosaiced_measurement'
 
     num_aug = 1
     im_size = 32
