@@ -14,7 +14,6 @@ from tensorboardX import SummaryWriter
 from torch import nn
 from torch.utils.data.sampler import SubsetRandomSampler
 from multiresolutionTransform import MultiResolution
-from PIL import Image
 
 from model1 import AttnVGG_before
 from model2 import AttnVGG_after
@@ -60,7 +59,7 @@ class NWPUDataset(torch.utils.data.Dataset):
 
 def testmain():
     dummy_x = torch.randn(1, 15, 32, 32)
-    model = AttnVGG_before(im_size=32, num_classes=88,
+    model = AttnVGG_before(im_size=32, num_classes=87,
                    attention=not opt.no_attention, normalize_attn=opt.normalize_attn, init='xavierUniform')
     logits = model(dummy_x)  # (1,3)
     print(model)
@@ -198,49 +197,6 @@ def main():
                 correct += torch.eq(predict, labels_test).sum().double().item()
             writer.add_scalar('test/accuracy', correct / total, epoch)
             print("[epoch %d] accuracy on test data: %.2f%%\n" % (epoch, 100 * correct / total))
-
-            # log images
-            if opt.log_images:
-                # print('\nlog images ...\n')
-                I_train = utils.make_grid(images_disp[0], nrow=6, normalize=True, scale_each=True)
-                writer.add_image('train/image', I_train, epoch)
-                if epoch == 0:
-                    I_test = utils.make_grid(images_disp[1], nrow=6, normalize=True, scale_each=True)
-                    writer.add_image('test/image', I_test, epoch)
-            if opt.log_images and (not opt.no_attention):
-                # print('\nlog attention maps ...\n')
-                # base factor
-                if opt.attn_mode == 'before':
-                    min_up_factor = 1
-                else:
-                    min_up_factor = 2
-                # sigmoid or softmax
-                if opt.normalize_attn:
-                    vis_fun = visualize_attn_softmax
-                else:
-                    vis_fun = visualize_attn_sigmoid
-                # training data
-                __, c1, c2, c3 = model(images_disp[0])
-                if c1 is not None:
-                    attn1 = vis_fun(I_train, c1, up_factor=min_up_factor, nrow=6)
-                    writer.add_image('train/attention_map_1', attn1, epoch)
-                if c2 is not None:
-                    attn2 = vis_fun(I_train, c2, up_factor=min_up_factor * 2, nrow=6)
-                    writer.add_image('train/attention_map_2', attn2, epoch)
-                if c3 is not None:
-                    attn3 = vis_fun(I_train, c3, up_factor=min_up_factor * 4, nrow=6)
-                    writer.add_image('train/attention_map_3', attn3, epoch)
-                # test data
-                __, c1, c2, c3 = model(images_disp[1])
-                if c1 is not None:
-                    attn1 = vis_fun(I_test, c1, up_factor=min_up_factor, nrow=6)
-                    writer.add_image('test/attention_map_1', attn1, epoch)
-                if c2 is not None:
-                    attn2 = vis_fun(I_test, c2, up_factor=min_up_factor * 2, nrow=6)
-                    writer.add_image('test/attention_map_2', attn2, epoch)
-                if c3 is not None:
-                    attn3 = vis_fun(I_test, c3, up_factor=min_up_factor * 4, nrow=6)
-                    writer.add_image('test/attention_map_3', attn3, epoch)
         print('{} seconds'.format(time.time() - t0))
 
 
