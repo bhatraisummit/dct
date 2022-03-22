@@ -55,25 +55,23 @@ data_path = '/home/s571b087/lensless/project/rice_face/demosaiced_measurement'
 data_path_train = '/home/s571b087/lensless/project/rice_face/flatcam_split_dataset/train'
 data_path_test = '/home/s571b087/lensless/project/rice_face/flatcam_split_dataset/test'
 
-transform_data = transforms.Compose([
-    transforms.ToTensor()
-])
-dataset = NWPUDataset(data_path=data_path, transform=transform_data)
-mean, std = get_mean_and_std(dataset)
-print(f'Dataset Mean: {mean}, std: {std}')
+# transform_data = transforms.Compose([
+#     transforms.ToTensor()
+# ])
+# dataset = NWPUDataset(data_path=data_path, transform=transform_data)
+# mean, std = get_mean_and_std(dataset)
+# print(f'Dataset Mean: {mean}, std: {std}')
 im_size = 32
 num_classes = 87
 num_images_per_class = 274
 
 transform_train = transforms.Compose([
-    transforms.Normalize(mean, std),
     MultiResolution(),
     # transforms.RandomHorizontalFlip(),
     transforms.ToTensor()
 ])
 
 transform_test = transforms.Compose([
-    transforms.Normalize(mean, std),
     MultiResolution(),
     transforms.ToTensor()
 ])
