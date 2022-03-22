@@ -192,7 +192,7 @@ def main():
                 # if i == 0:  # archive images in order to save to logs
                 #     images_disp.append(inputs[0:36, :, :, :])
                 pred_test, __, __, __ = model(images_test)
-                loss = criterion(images_test, labels_test)
+                loss = criterion(pred_test, labels_test)
                 test_loss += loss.item()
                 predict = torch.argmax(pred_test, 1)
                 total += labels_test.size(0)
