@@ -26,9 +26,9 @@ parser = argparse.ArgumentParser(description="LearnToPayAttn-CIFAR10")
 
 parser.add_argument("--batch_size", type=int, default=64, help="batch size")
 parser.add_argument("--epochs", type=int, default=100, help="number of epochs")
-parser.add_argument("--lr", type=float, default=0.001, help="initial learning rate")
+parser.add_argument("--lr", type=float, default=0.1, help="initial learning rate")
 parser.add_argument("--outf", type=str, default="logs", help='path of log files')
-parser.add_argument("--attn_mode", type=str, default="after",
+parser.add_argument("--attn_mode", type=str, default="before",
                     help='insert attention modules before OR after maxpooling layers')
 
 parser.add_argument("--normalize_attn", action='store_true',
@@ -69,7 +69,8 @@ def testmain():
 def main():
     ## load data
     data_path = '/scratch/s571b087/project/Lensless_Imaging/rice_face/demosaiced_measurement'
-    #data_path = '/home/s571b087/lensless/project/rice_face/demosaiced_measurement'
+    data_path_train = '/scratch/s571b087/project/Lensless_Imaging/rice_face/flatcam_split_dataset/train'
+    data_path_test = '/scratch/s571b087/project/Lensless_Imaging/rice_face/flatcam_split_dataset/test'
 
     num_aug = 1
     im_size = 32
@@ -88,18 +89,13 @@ def main():
         transforms.ToTensor()
     ])
 
-    train_data = NWPUDataset(data_path=data_path, transform=transform_train)
-    test_data = NWPUDataset(data_path=data_path, transform=transform_test)
+    train_data = NWPUDataset(data_path=data_path_train, transform=transform_train)
+    test_data = NWPUDataset(data_path=data_path_test, transform=transform_test)
 
-    split = int(np.floor(train_split * num_images_per_class))
-    indices = np.arange(num_classes * num_images_per_class).reshape(-1, num_images_per_class)
-    train_indices, test_indices = indices[:, :split].flatten(), indices[:, split:].flatten()
-
-    trainloader = torch.utils.data.DataLoader(train_data, batch_size=opt.batch_size, shuffle=False, num_workers=0,
-                                              sampler=SubsetRandomSampler(train_indices))
+    trainloader = torch.utils.data.DataLoader(train_data, batch_size=opt.batch_size, shuffle=True, num_workers=0,
+                                              sampler=None)
     testloader = torch.utils.data.DataLoader(test_data, batch_size=opt.batch_size, shuffle=False, num_workers=0,
-                                             sampler=SubsetRandomSampler(test_indices))
-
+                                             sampler=None)
     # use attention module?
     if not opt.no_attention:
         print('turn on attention ...\n')
