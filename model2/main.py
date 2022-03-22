@@ -117,7 +117,6 @@ def train(epoch):
     train_loss = 0
     correct = 0
     total = 0
-    accuracy = 0
     for batch_idx, (inputs, targets) in enumerate(trainloader):
         inputs, targets = inputs.to(device), targets.to(device)
         optimizer.zero_grad()
@@ -130,12 +129,11 @@ def train(epoch):
         _, predicted = torch.max(outputs.data, 1)
         total += targets.size(0)
         correct += predicted.eq(targets.data).cpu().sum()
-        accuracy = 100. * correct / total
 
         progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                      % (train_loss / (batch_idx + 1), 100. * correct / total, correct, total))
-    writer.add_scalar('train/loss', train_loss, epoch)
-    writer.add_scalar('train/accuracy', accuracy, epoch)
+    writer.add_scalar('train/loss', round(train_loss/len(trainloader), 2), epoch)
+    writer.add_scalar('train/accuracy', 100. * correct/len(trainloader), epoch)
     scheduler.step()
 
 
@@ -146,8 +144,6 @@ def test(epoch):
     test_loss = 0
     correct = 0
     total = 0
-    acc = 0
-    loss = 0
     for batch_idx, (inputs, targets) in enumerate(testloader):
         inputs, targets = inputs.to(device), targets.to(device)
         outputs = net(inputs)
@@ -158,11 +154,10 @@ def test(epoch):
         total += targets.size(0)
         correct += predicted.eq(targets.data).cpu().sum()
         loss = test_loss / (batch_idx + 1)
-        acc = 100. * correct / total
         progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                      % (test_loss / (batch_idx + 1), 100. * correct / total, correct, total))
-    writer.add_scalar('test/accuracy', acc, epoch)
-    writer.add_scalar('test/loss', loss, epoch)
+    writer.add_scalar('test/accuracy', 100. * correct/len(testloader), epoch)
+    writer.add_scalar('test/loss', round(test_loss/len(testloader), 2), epoch)
 
     # Save checkpoint.
     acc = 100. * correct / total
