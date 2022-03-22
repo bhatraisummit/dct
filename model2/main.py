@@ -55,6 +55,7 @@ data_path = '/scratch/s571b087/project/Lensless_Imaging/rice_face/demosaiced_mea
 data_path_train = '/home/s571b087/lensless/project/rice_face/flatcam_split_dataset/train'
 data_path_test = '/home/s571b087/lensless/project/rice_face/flatcam_split_dataset/test'
 
+dataset = torchvision.datasets.ImageFolder(root=data_path)
 mean, std = get_mean_and_std(data_path)
 print(f'Dataset Mean: {mean}, std: {std}')
 im_size = 32
