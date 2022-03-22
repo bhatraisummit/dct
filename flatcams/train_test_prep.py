@@ -1,5 +1,7 @@
 import os
 
+data_path = '/home/s571b087/lensless/project/rice_face'
+
 
 def split_train_Test(data_path):
     root_dir = [x for x in os.walk(data_path, 'demosaiced_measurement')]
@@ -51,3 +53,6 @@ def split_train_Test(data_path):
             source_im = os.path.join(class_dir, image_name)
             dest_im = os.path.join(test_dir, class_name, image_name)
             os.system(f'cp {source_im} {dest_im}')
+
+
+split_train_Test(data_path)
