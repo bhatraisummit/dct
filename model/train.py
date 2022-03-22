@@ -15,7 +15,7 @@ from torch import nn
 from torch.utils.data.sampler import SubsetRandomSampler
 from multiresolutionTransform import MultiResolution
 
-from model1 import AttnVGG_before
+from modelBefore import AttnVGG_before
 from modelAfter import AttnVGG_after
 from utilities import *
 
