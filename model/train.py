@@ -18,6 +18,7 @@ from multiresolutionTransform import MultiResolution
 from modelBefore import AttnVGG_before
 from modelAfter import AttnVGG_after
 from utilities import *
+from utils import progress_bar, get_mean_and_std
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = "0,1"
@@ -60,7 +61,7 @@ class NWPUDataset(torch.utils.data.Dataset):
 def testmain():
     dummy_x = torch.randn(1, 15, 32, 32)
     model = AttnVGG_before(im_size=32, num_classes=87,
-                   attention=not opt.no_attention, normalize_attn=opt.normalize_attn, init='xavierUniform')
+                           attention=not opt.no_attention, normalize_attn=opt.normalize_attn, init='xavierUniform')
     logits = model(dummy_x)  # (1,3)
     print(model)
     print(logits)
@@ -74,9 +75,7 @@ def main():
 
     num_aug = 1
     im_size = 32
-    train_split = 0.7
     num_classes = 87
-    num_images_per_class = 274
 
     transform_train = transforms.Compose([
         MultiResolution(),
@@ -167,6 +166,8 @@ def main():
                     writer.add_scalar('train/loss', loss.item(), step)
                     writer.add_scalar('train/accuracy', accuracy, step)
                     writer.add_scalar('train/running_avg_accuracy', running_avg_accuracy, step)
+                    progress_bar(i, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
+                                 % (loss.item() / (i + 1), 100. * correct / total, correct, total))
                     # print("[epoch %d][aug %d/%d][%d/%d] loss %.4f accuracy %.2f%% running avg accuracy %.2f%%"
                     #     % (epoch, aug, num_aug-1, i, len(trainloader)-1, loss.item(), (100*accuracy), (100*running_avg_accuracy)))
                 step += 1
@@ -181,6 +182,7 @@ def main():
         model.eval()
         total = 0
         correct = 0
+        test_loss = 0
         with torch.no_grad():
             # log scalars
             for i, data in enumerate(testloader, 0):
@@ -189,9 +191,13 @@ def main():
                 # if i == 0:  # archive images in order to save to logs
                 #     images_disp.append(inputs[0:36, :, :, :])
                 pred_test, __, __, __ = model(images_test)
+                loss = criterion(images_test, labels_test)
+                test_loss += loss.item()
                 predict = torch.argmax(pred_test, 1)
                 total += labels_test.size(0)
                 correct += torch.eq(predict, labels_test).sum().double().item()
+                progress_bar(i, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
+                             % (test_loss / (i + 1), 100. * correct / total, correct, total))
             writer.add_scalar('test/accuracy', correct / total, epoch)
             print("[epoch %d] accuracy on test data: %.2f%%\n" % (epoch, 100 * correct / total))
         print('{} seconds'.format(time.time() - t0))

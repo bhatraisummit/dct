@@ -153,7 +153,6 @@ def test(epoch):
         _, predicted = torch.max(outputs.data, 1)
         total += targets.size(0)
         correct += predicted.eq(targets.data).cpu().sum()
-        loss = test_loss / (batch_idx + 1)
         progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                      % (test_loss / (batch_idx + 1), 100. * correct / total, correct, total))
     writer.add_scalar('test/accuracy', 100. * correct/len(testloader), epoch)
