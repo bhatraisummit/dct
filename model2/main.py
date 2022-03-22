@@ -51,7 +51,7 @@ class NWPUDataset(torch.utils.data.Dataset):
 # Data
 print('==> Preparing data..')
 
-data_path = '/scratch/s571b087/project/Lensless_Imaging/rice_face/demosaiced_measurement'
+data_path = '/home/s571b087/lensless/project/rice_face/demosaiced_measurement'
 data_path_train = '/home/s571b087/lensless/project/rice_face/flatcam_split_dataset/train'
 data_path_test = '/home/s571b087/lensless/project/rice_face/flatcam_split_dataset/test'
 
