@@ -1,6 +1,6 @@
 import os
 
-data_path = '/home/s571b087/lensless/project/rice_face'
+data_path = '/Users/summit/Desktop/research/NWPU'
 
 
 def split_train_Test(data_path):
@@ -43,13 +43,12 @@ def split_train_Test(data_path):
 
     for c, sub_dir in enumerate(root_dir[1:]):
         class_dir = sub_dir[0]
-        for image_name in train_dir:
-            class_name = os.path.split(class_dir)[1]
+        class_name = os.path.split(class_dir)[1]
+        for image_name in train_image:
             source_im = os.path.join(class_dir, image_name)
             dest_im = os.path.join(train_dir, class_name, image_name)
             os.system(f'cp {source_im} {dest_im}')
-        for image_name in test_dir:
-            class_name = os.path.split(class_dir)[1]
+        for image_name in test_image:
             source_im = os.path.join(class_dir, image_name)
             dest_im = os.path.join(test_dir, class_name, image_name)
             os.system(f'cp {source_im} {dest_im}')
