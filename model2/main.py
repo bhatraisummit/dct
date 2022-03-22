@@ -52,10 +52,10 @@ class NWPUDataset(torch.utils.data.Dataset):
 print('==> Preparing data..')
 
 # data_path = '/scratch/s571b087/project/Lensless_Imaging/rice_face/demosaiced_measurement'
-data_path = '/home/s571b087/lensless/project/rice_face/demosaiced_measurement'
+data_path_train = '/home/s571b087/lensless/project/rice_face/flatcam_split_dataset/train'
+data_path_test = '/home/s571b087/lensless/project/rice_face/flatcam_split_dataset/test'
 
 im_size = 32
-train_split = 0.7
 num_classes = 87
 num_images_per_class = 274
 
@@ -70,17 +70,13 @@ transform_test = transforms.Compose([
     transforms.ToTensor()
 ])
 
-train_data = NWPUDataset(data_path=data_path, transform=transform_train)
-test_data = NWPUDataset(data_path=data_path, transform=transform_test)
+train_data = NWPUDataset(data_path=data_path_train, transform=transform_train)
+test_data = NWPUDataset(data_path=data_path_test, transform=transform_test)
 
-split = int(np.floor(train_split * num_images_per_class))
-indices = np.arange(num_classes * num_images_per_class).reshape(-1, num_images_per_class)
-train_indices, test_indices = indices[:, :split].flatten(), indices[:, split:].flatten()
-
-trainloader = torch.utils.data.DataLoader(train_data, batch_size=args.batch_size, shuffle=False, num_workers=0,
-                                          sampler=SubsetRandomSampler(train_indices))
+trainloader = torch.utils.data.DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers=0,
+                                          sampler=None)
 testloader = torch.utils.data.DataLoader(test_data, batch_size=args.batch_size, shuffle=False, num_workers=0,
-                                         sampler=SubsetRandomSampler(test_indices))
+                                         sampler=None)
 
 writer = SummaryWriter(args.outf)
 
@@ -95,7 +91,7 @@ if args.resume:
     start_epoch = checkpoint['epoch']
 else:
     print('==> Building model..')
-    net = VGG_ATT(mode='dp')
+    net = VGG_ATT(mode='pc')
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 net = torch.nn.DataParallel(net, device_ids=list(range(torch.cuda.device_count()))).to(device)
