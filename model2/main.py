@@ -16,7 +16,7 @@ import argparse
 import numpy as np
 
 from vgg import *
-from utils import progress_bar
+from utils import progress_bar, get_mean_and_std
 from torch.autograd import Variable
 from torch.optim.lr_scheduler import StepLR
 
@@ -51,21 +51,25 @@ class NWPUDataset(torch.utils.data.Dataset):
 # Data
 print('==> Preparing data..')
 
-# data_path = '/scratch/s571b087/project/Lensless_Imaging/rice_face/demosaiced_measurement'
+data_path = '/scratch/s571b087/project/Lensless_Imaging/rice_face/demosaiced_measurement'
 data_path_train = '/home/s571b087/lensless/project/rice_face/flatcam_split_dataset/train'
 data_path_test = '/home/s571b087/lensless/project/rice_face/flatcam_split_dataset/test'
 
+mean, std = get_mean_and_std(data_path)
+print(f'Dataset Mean: {mean}, std: {std}')
 im_size = 32
 num_classes = 87
 num_images_per_class = 274
 
 transform_train = transforms.Compose([
+    transforms.Normalize(mean, std),
     MultiResolution(),
     # transforms.RandomHorizontalFlip(),
     transforms.ToTensor()
 ])
 
 transform_test = transforms.Compose([
+    transforms.Normalize(mean, std),
     MultiResolution(),
     transforms.ToTensor()
 ])
