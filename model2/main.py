@@ -83,8 +83,8 @@ trainloader = torch.utils.data.DataLoader(train_data, batch_size=args.batch_size
                                           sampler=None)
 testloader = torch.utils.data.DataLoader(test_data, batch_size=args.batch_size, shuffle=False, num_workers=0,
                                          sampler=None)
-
-writer = SummaryWriter(args.outf)
+log_path = f'{args.outf}_lr_{args.lr}_bs_{args.batch_size}'
+writer = SummaryWriter(log_path)
 
 # Model
 if args.resume:
