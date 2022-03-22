@@ -4,7 +4,7 @@ data_path = '/home/s571b087/lensless/project/rice_face'
 
 
 def split_train_Test(data_path):
-    root_dir = [x for x in os.walk(data_path, 'demosaiced_measurement')]
+    root_dir = [x for x in os.walk(os.path.join(data_path, 'demosaiced_measurement'))]
     root_new = os.path.join(data_path, 'flatcam_split_dataset')
     test = os.path.join(root_new, 'test')
     train = os.path.join(root_new, 'train')
@@ -46,11 +46,11 @@ def split_train_Test(data_path):
         class_name = os.path.split(class_dir)[1]
         for image_name in train_image:
             source_im = os.path.join(class_dir, image_name)
-            dest_im = os.path.join(train_dir, class_name, image_name)
+            dest_im = os.path.join(train, class_name, image_name)
             os.system(f'cp {source_im} {dest_im}')
         for image_name in test_image:
             source_im = os.path.join(class_dir, image_name)
-            dest_im = os.path.join(test_dir, class_name, image_name)
+            dest_im = os.path.join(test, class_name, image_name)
             os.system(f'cp {source_im} {dest_im}')
 
 
