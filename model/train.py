@@ -132,7 +132,8 @@ def main():
     t0 = time.time()
     step = 0
     running_avg_accuracy = 0
-    writer = SummaryWriter(opt.outf)
+    log_path = f'{opt.outf}_lr_{opt.lr}_bs_{opt.batch_size}'
+    writer = SummaryWriter(log_path)
     for epoch in range(opt.epochs):
         images_disp = []
         writer.add_scalar('train/learning_rate', optimizer.param_groups[0]['lr'], epoch)
