@@ -16,7 +16,7 @@ from torch.utils.data.sampler import SubsetRandomSampler
 from multiresolutionTransform import MultiResolution
 
 from model1 import AttnVGG_before
-from model2 import AttnVGG_after
+from modelAfter import AttnVGG_after
 from utilities import *
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
