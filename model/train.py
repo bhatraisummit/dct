@@ -165,7 +165,7 @@ def main():
                 correct += torch.eq(predict, labels).sum().double().item()
                 step += 1
                 progress_bar(i, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
-                             % (loss.item() / (i + 1), 100. * correct / total, correct, total))
+                             % (train_loss / (i + 1), 100. * correct / total, correct, total))
             writer.add_scalar('train/loss', round(train_loss / len(trainloader), 2), epoch)
             writer.add_scalar('train/accuracy', 100. * correct / len(trainloader), epoch)
 
