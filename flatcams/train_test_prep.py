@@ -1,6 +1,6 @@
 import os
 
-data_path = '/Users/summit/Desktop/research/NWPU'
+data_path = '/home/s571b087/lensless/project/rice_face'
 
 
 def split_train_Test(data_path):
