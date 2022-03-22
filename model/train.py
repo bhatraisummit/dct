@@ -139,6 +139,9 @@ def main():
         # print("\nepoch %d learning rate %f\n" % (epoch, optimizer.param_groups[0]['lr']))
         # run for one epoch
         for aug in range(num_aug):
+            train_loss = 0
+            correct = 0
+            total = 0
             for i, data in enumerate(trainloader, 0):
                 # warm up
                 model.train()
@@ -154,23 +157,21 @@ def main():
                 loss = criterion(pred, labels)
                 loss.backward()
                 optimizer.step()
+                train_loss += loss.item()
                 # display results
-                if i % 10 == 0:
-                    model.eval()
-                    pred, __, __, __ = model(inputs)
-                    predict = torch.argmax(pred, 1)
-                    total = labels.size(0)
-                    correct = torch.eq(predict, labels).sum().double().item()
-                    accuracy = correct / total
-                    running_avg_accuracy = 0.9 * running_avg_accuracy + 0.1 * accuracy
-                    writer.add_scalar('train/loss', loss.item(), step)
-                    writer.add_scalar('train/accuracy', accuracy, step)
-                    writer.add_scalar('train/running_avg_accuracy', running_avg_accuracy, step)
-                    progress_bar(i, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
-                                 % (loss.item() / (i + 1), 100. * correct / total, correct, total))
-                    # print("[epoch %d][aug %d/%d][%d/%d] loss %.4f accuracy %.2f%% running avg accuracy %.2f%%"
-                    #     % (epoch, aug, num_aug-1, i, len(trainloader)-1, loss.item(), (100*accuracy), (100*running_avg_accuracy)))
+                pred, __, __, __ = model(inputs)
+                predict = torch.argmax(pred, 1)
+                total += labels.size(0)
+                correct += torch.eq(predict, labels).sum().double().item()
+                accuracy = correct / total
                 step += 1
+            writer.add_scalar('train/loss', round(train_loss / len(trainloader), 2), epoch)
+            writer.add_scalar('train/accuracy', 100. * correct / len(trainloader), epoch)
+            progress_bar(i, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
+                         % (loss.item() / (i + 1), 100. * correct / total, correct, total))
+            # print("[epoch %d][aug %d/%d][%d/%d] loss %.4f accuracy %.2f%% running avg accuracy %.2f%%"
+            #     % (epoch, aug, num_aug-1, i, len(trainloader)-1, loss.item(), (100*accuracy), (100*running_avg_accuracy)))
+
         # adjust learning rate
         scheduler.step()
 
@@ -198,9 +199,11 @@ def main():
                 correct += torch.eq(predict, labels_test).sum().double().item()
                 progress_bar(i, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                              % (test_loss / (i + 1), 100. * correct / total, correct, total))
-            writer.add_scalar('test/accuracy', correct / total, epoch)
+            writer.add_scalar('test/accuracy', 100. * correct / len(testloader), epoch)
+            writer.add_scalar('test/loss', round(test_loss / len(testloader), 2), epoch)
             print("[epoch %d] accuracy on test data: %.2f%%\n" % (epoch, 100 * correct / total))
         print('{} seconds'.format(time.time() - t0))
+
 
 
 if __name__ == "__main__":
