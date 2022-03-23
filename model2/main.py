@@ -32,6 +32,31 @@ best_acc = 0  # best test accuracy
 start_epoch = 0  # start from epoch 0 or last checkpoint epoch
 
 
+def npy_loader(path):
+    sample = torch.from_numpy(np.load(path))
+    return sample
+
+
+class Numpy_Dataset(torch.utils.data.Dataset):
+
+    def __init__(self, data_path='../NWPU-RESISC45/', transform=None):
+        self.dataset = torchvision.datasets.DatasetFolder(
+            root=data_path,
+            loader=npy_loader,
+            extensions='.npy'
+        )
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, idx):
+        image, label = self.dataset[idx]
+        if self.transform:
+            image = self.transform(image)
+        return image, label
+
+
 class NWPUDataset(torch.utils.data.Dataset):
 
     def __init__(self, data_path='../NWPU-RESISC45/', transform=None):
@@ -76,14 +101,30 @@ transform_test = transforms.Compose([
     transforms.ToTensor()
 ])
 
-train_data = NWPUDataset(data_path=data_path_train, transform=transform_train)
-test_data = NWPUDataset(data_path=data_path_test, transform=transform_test)
+mean = ()
+std = ()
+transform_train_np = transforms.Compose([
+    # transforms.RandomHorizontalFlip(),
+    transforms.ToTensor(),
+    transforms.Normalize(mean, std)
+])
+
+transform_test_np = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize(mean, std)
+])
+
+train_data = Numpy_Dataset(data_path=data_path_train, transform=transform_train_np)
+test_data = Numpy_Dataset(data_path=data_path_test, transform=transform_test_np)
+
+# train_data = NWPUDataset(data_path=data_path_train, transform=transform_train)
+# test_data = NWPUDataset(data_path=data_path_test, transform=transform_test)
 
 trainloader = torch.utils.data.DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers=0,
                                           sampler=None)
 testloader = torch.utils.data.DataLoader(test_data, batch_size=args.batch_size, shuffle=False, num_workers=0,
                                          sampler=None)
-log_path = f'{args.outf}_lr_{args.lr}_bs_{args.batch_size}'
+log_path = f'np_{args.outf}_lr_{args.lr}_bs_{args.batch_size}'
 writer = SummaryWriter(log_path)
 
 # Model
@@ -132,8 +173,8 @@ def train(epoch):
 
         progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                      % (train_loss / (batch_idx + 1), 100. * correct / total, correct, total))
-    writer.add_scalar('train/loss', round(train_loss/len(trainloader), 2), epoch)
-    writer.add_scalar('train/accuracy', 100. * correct/len(trainloader), epoch)
+    writer.add_scalar('train/loss', round(train_loss / len(trainloader), 2), epoch)
+    writer.add_scalar('train/accuracy', 100. * correct / len(trainloader), epoch)
     scheduler.step()
 
 
@@ -155,8 +196,8 @@ def test(epoch):
         correct += predicted.eq(targets.data).cpu().sum()
         progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                      % (test_loss / (batch_idx + 1), 100. * correct / total, correct, total))
-    writer.add_scalar('test/accuracy', 100. * correct/len(testloader), epoch)
-    writer.add_scalar('test/loss', round(test_loss/len(testloader), 2), epoch)
+    writer.add_scalar('test/accuracy', 100. * correct / len(testloader), epoch)
+    writer.add_scalar('test/loss', round(test_loss / len(testloader), 2), epoch)
 
     # Save checkpoint.
     acc = 100. * correct / total

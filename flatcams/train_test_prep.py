@@ -4,13 +4,13 @@ data_path = '/home/s571b087/lensless/project/rice_face'
 
 
 def split_train_Test(data_path):
-    root_dir = [x for x in os.walk(os.path.join(data_path, 'demosaiced_measurement'))]
-    root_new = os.path.join(data_path, 'flatcam_split_dataset')
+    root_dir = [x for x in os.walk(os.path.join(data_path, 'demosaiced_measurement_np'))]
+    root_new = os.path.join(data_path, 'flatcam_split_dataset_np')
     test = os.path.join(root_new, 'test')
     train = os.path.join(root_new, 'train')
     test_image = []
     train_image = []
-    extension = '.png'
+    extension = '.npy'
     for i in range(1, 8):
         train_image.append(f'00{i}{extension}')
     for i in range(8, 10):

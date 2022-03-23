@@ -7,13 +7,15 @@ import os
 import sys
 import time
 import math
+import numpy as np
+import torchvision
 
 import torch
 import torch.nn as nn
 import torch.nn.init as init
 
 
-def get_mean_and_std(dataset):
+def get_mean_and_std_PIL(dataset):
     '''Compute the mean and std value of dataset.'''
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=True, num_workers=2)
     mean = torch.zeros(3)
@@ -26,6 +28,37 @@ def get_mean_and_std(dataset):
     mean.div_(len(dataset))
     std.div_(len(dataset))
     return mean, std
+
+
+def npy_loader(path):
+    sample = torch.from_numpy(np.load(path))
+    return sample
+
+
+def get_mean_and_std(datapath):
+    '''Compute the mean and std value of dataset.'''
+    dataset = torchvision.datasets.DatasetFolder(
+        root=datapath,
+        loader=npy_loader,
+        extensions='.npy'
+    )
+    print(len(dataset))
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=True)
+    mean = torch.zeros(15)
+    std = torch.zeros(15)
+    print('==> Computing mean and std..')
+    for inputs, targets in dataloader:
+        for i in range(15):
+            mean[i] += inputs[:, i, :, :].mean()
+            std[i] += inputs[:, i, :, :].std()
+    mean.div_(len(dataset))
+    std.div_(len(dataset))
+    return tuple(mean.numpy()), tuple(std.numpy())
+
+# data_path = '/Users/summit/Desktop/test_np'
+data_path = '/home/s571b087/lensless/project/rice_face/demosaiced_measurement_np'
+mean , std = get_mean_and_std(data_path)
+print(get_mean_and_std(data_path))
 
 
 def init_params(net):
