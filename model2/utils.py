@@ -13,6 +13,7 @@ import torchvision
 import torch
 import torch.nn as nn
 import torch.nn.init as init
+from torchvision.transforms import transforms
 
 
 def get_mean_and_std_PIL(dataset):
@@ -31,17 +32,37 @@ def get_mean_and_std_PIL(dataset):
 
 
 def npy_loader(path):
-    sample = torch.from_numpy(np.load(path))
+    sample = np.load(path)
     return sample
+
+
+class Numpy_Dataset(torch.utils.data.Dataset):
+
+    def __init__(self, data_path='../NWPU-RESISC45/', transform=None):
+        self.dataset = torchvision.datasets.DatasetFolder(
+            root=data_path,
+            loader=npy_loader,
+            extensions='.npy'
+        )
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, idx):
+        image, label = self.dataset[idx]
+        print(image)
+        if self.transform:
+            image = self.transform(image)
+        return image, label
 
 
 def get_mean_and_std(datapath):
     '''Compute the mean and std value of dataset.'''
-    dataset = torchvision.datasets.DatasetFolder(
-        root=datapath,
-        loader=npy_loader,
-        extensions='.npy'
-    )
+    transform_data = transforms.Compose([
+        transforms.ToTensor()
+    ])
+    dataset = Numpy_Dataset(data_path=data_path, transform=transform_data)
     print(len(dataset))
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=True)
     mean = torch.zeros(15)
@@ -55,9 +76,10 @@ def get_mean_and_std(datapath):
     std.div_(len(dataset))
     return tuple(mean.numpy()), tuple(std.numpy())
 
+
 # data_path = '/Users/summit/Desktop/test_np'
-data_path = '/home/s571b087/lensless/project/rice_face/demosaiced_measurement_np'
-mean , std = get_mean_and_std(data_path)
+data_path = '/scratch/s571b087/project/Lensless_Imaging/rice_face/demosaiced_measurement_np'
+mean, std = get_mean_and_std(data_path)
 print(get_mean_and_std(data_path))
 
 

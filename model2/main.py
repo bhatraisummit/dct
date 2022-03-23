@@ -33,7 +33,7 @@ start_epoch = 0  # start from epoch 0 or last checkpoint epoch
 
 
 def npy_loader(path):
-    sample = torch.from_numpy(np.load(path))
+    sample = np.load(path)
     return sample
 
 
