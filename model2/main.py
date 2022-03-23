@@ -76,16 +76,13 @@ class NWPUDataset(torch.utils.data.Dataset):
 # Data
 print('==> Preparing data..')
 
-data_path = '/home/s571b087/lensless/project/rice_face/demosaiced_measurement'
-data_path_train = '/home/s571b087/lensless/project/rice_face/flatcam_split_dataset/train'
-data_path_test = '/home/s571b087/lensless/project/rice_face/flatcam_split_dataset/test'
+data_path = '/scratch/s571b087/project/Lensless_Imaging/rice_face/demosaiced_measurement_np'
+data_path_train = '/scratch/s571b087/project/Lensless_Imaging/rice_face/flatcam_split_dataset_np/train'
+data_path_test = '/scratch/s571b087/project/Lensless_Imaging/rice_face/flatcam_split_dataset_np/test'
+# data_path = '/home/s571b087/lensless/project/rice_face/demosaiced_measurement'
+# data_path_train = '/home/s571b087/lensless/project/rice_face/flatcam_split_dataset/train'
+# data_path_test = '/home/s571b087/lensless/project/rice_face/flatcam_split_dataset/test'
 
-# transform_data = transforms.Compose([
-#     transforms.ToTensor()
-# ])
-# dataset = NWPUDataset(data_path=data_path, transform=transform_data)
-# mean, std = get_mean_and_std(dataset)
-# print(f'Dataset Mean: {mean}, std: {std}')
 im_size = 32
 num_classes = 87
 num_images_per_class = 274
