@@ -168,7 +168,7 @@ def main():
                 progress_bar(i, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                              % (train_loss / (i + 1), 100. * correct / total, correct, total))
             writer.add_scalar('train/loss', round(train_loss / len(trainloader), 2), epoch)
-            writer.add_scalar('train/accuracy', 100. * correct / len(trainloader), epoch)
+            writer.add_scalar('train/accuracy', correct / len(trainloader), epoch)
 
             # print("[epoch %d][aug %d/%d][%d/%d] loss %.4f accuracy %.2f%% running avg accuracy %.2f%%"
             #     % (epoch, aug, num_aug-1, i, len(trainloader)-1, loss.item(), (100*accuracy), (100*running_avg_accuracy)))
@@ -200,7 +200,7 @@ def main():
                 correct += torch.eq(predict, labels_test).sum().double().item()
                 progress_bar(i, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                              % (test_loss / (i + 1), 100. * correct / total, correct, total))
-            writer.add_scalar('test/accuracy', 100. * correct / len(testloader), epoch)
+            writer.add_scalar('test/accuracy', correct / len(testloader), epoch)
             writer.add_scalar('test/loss', round(test_loss / len(testloader), 2), epoch)
             print("[epoch %d] accuracy on test data: %.2f%%\n" % (epoch, 100 * correct / total))
         print('{} seconds'.format(time.time() - t0))

@@ -25,6 +25,7 @@ parser.add_argument("--batch_size", type=int, default=100, help="batch size")
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
 parser.add_argument("--outf", type=str, default="logs", help='path of log files')
 parser.add_argument('--resume', '-r', action='store_true', help='resume from checkpoint')
+parser.add_argument('--mode', type=str, default='pc', help='attention mode')
 args = parser.parse_args()
 
 use_cuda = torch.cuda.is_available()
@@ -121,7 +122,8 @@ trainloader = torch.utils.data.DataLoader(train_data, batch_size=args.batch_size
                                           sampler=None)
 testloader = torch.utils.data.DataLoader(test_data, batch_size=args.batch_size, shuffle=False, num_workers=0,
                                          sampler=None)
-log_path = f'np_{args.outf}_lr_{args.lr}_bs_{args.batch_size}'
+lr_str = str(args.lr)
+log_path = f'np_{args.outf}_lr_{lr_str.split(".")[-1]}_bs_{args.batch_size}_attn_mode_{args.mode}'
 writer = SummaryWriter(log_path)
 
 # Model
@@ -133,9 +135,12 @@ if args.resume:
     net = checkpoint['net']
     best_acc = checkpoint['acc']
     start_epoch = checkpoint['epoch']
-else:
+elif args.mode == 'pc' or args.mode == 'dp':
     print('==> Building model..')
-    net = VGG_ATT(mode='pc')
+    net = VGG_ATT(mode=args.mode)
+else:
+    print('==> Building VGG model..')
+    net = VGG('VGG11')
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 net = torch.nn.DataParallel(net, device_ids=list(range(torch.cuda.device_count()))).to(device)
@@ -171,7 +176,7 @@ def train(epoch):
         progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                      % (train_loss / (batch_idx + 1), 100. * correct / total, correct, total))
     writer.add_scalar('train/loss', round(train_loss / len(trainloader), 2), epoch)
-    writer.add_scalar('train/accuracy', 100. * correct / len(trainloader), epoch)
+    writer.add_scalar('train/accuracy', correct / len(trainloader), epoch)
     scheduler.step()
 
 
@@ -193,7 +198,7 @@ def test(epoch):
         correct += predicted.eq(targets.data).cpu().sum()
         progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                      % (test_loss / (batch_idx + 1), 100. * correct / total, correct, total))
-    writer.add_scalar('test/accuracy', 100. * correct / len(testloader), epoch)
+    writer.add_scalar('test/accuracy', correct / len(testloader), epoch)
     writer.add_scalar('test/loss', round(test_loss / len(testloader), 2), epoch)
 
     # Save checkpoint.

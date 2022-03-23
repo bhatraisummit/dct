@@ -62,7 +62,7 @@ def get_mean_and_std(datapath):
     transform_data = transforms.Compose([
         transforms.ToTensor()
     ])
-    dataset = Numpy_Dataset(data_path=data_path, transform=transform_data)
+    dataset = Numpy_Dataset(data_path=datapath, transform=transform_data)
     print(len(dataset))
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=True)
     mean = torch.zeros(15)
@@ -78,9 +78,9 @@ def get_mean_and_std(datapath):
 
 
 # data_path = '/Users/summit/Desktop/test_np'
-data_path = '/scratch/s571b087/project/Lensless_Imaging/rice_face/demosaiced_measurement_np'
-mean, std = get_mean_and_std(data_path)
-print(mean, std)
+# data_path = '/scratch/s571b087/project/Lensless_Imaging/rice_face/demosaiced_measurement_np'
+# mean, std = get_mean_and_std(data_path)
+# print(mean, std)
 
 
 def init_params(net):
