@@ -80,7 +80,7 @@ def get_mean_and_std(datapath):
 # data_path = '/Users/summit/Desktop/test_np'
 data_path = '/scratch/s571b087/project/Lensless_Imaging/rice_face/demosaiced_measurement_np'
 mean, std = get_mean_and_std(data_path)
-print(get_mean_and_std(data_path))
+print(mean, std)
 
 
 def init_params(net):

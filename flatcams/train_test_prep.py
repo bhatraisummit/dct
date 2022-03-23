@@ -1,6 +1,6 @@
 import os
 
-data_path = '/home/s571b087/lensless/project/rice_face'
+data_path = '/scratch/s571b087/project/Lensless_Imaging/rice_face'
 
 
 def split_train_Test(data_path):
