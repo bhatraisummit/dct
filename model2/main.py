@@ -16,6 +16,7 @@ import argparse
 import numpy as np
 
 from vgg import *
+from resnet import *
 from utils import progress_bar, get_mean_and_std
 from torch.autograd import Variable
 from torch.optim.lr_scheduler import StepLR
@@ -138,9 +139,13 @@ if args.resume:
 elif args.mode == 'pc' or args.mode == 'dp':
     print('==> Building model..')
     net = VGG_ATT(mode=args.mode)
-else:
+elif args.mode.startswith('vgg'):
+    vgg_cnf = args.mode.upper()
     print('==> Building VGG model..')
-    net = VGG('VGG11')
+    net = VGG(vgg_cnf)
+else:
+    print('==> Building Resnet model..')
+    net = ResNet18()
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 net = torch.nn.DataParallel(net, device_ids=list(range(torch.cuda.device_count()))).to(device)
