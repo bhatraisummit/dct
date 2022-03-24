@@ -48,8 +48,8 @@ def divide_dct(dct2_img):
 def multiresolution_dct(dct2_img):
     img_64 = dct2_img.resize((64, 64))
     img_dct_64 = dct2Dimg(np.asarray(img_64)).astype(np.uint8)
-    img_32 = dct2_img.resize((32, 32))
-    img_dct_32 = dct2Dimg(np.asarray(img_32)).astype(np.uint8)
-    x0, x1, x2, x3 = divide_dct(img_dct_64)
-    return np.concatenate((x0, x1, x2, x3, img_dct_32), axis=2)
+    img_128 = dct2_img.resize((128, 128))
+    img_dct_128 = dct2Dimg(np.asarray(img_128)).astype(np.uint8)
+    x0, x1, x2, x3 = divide_dct(img_dct_128)
+    return np.concatenate((x0, x1, x2, x3, img_dct_64), axis=2)
 

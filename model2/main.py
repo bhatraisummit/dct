@@ -78,9 +78,9 @@ class NWPUDataset(torch.utils.data.Dataset):
 # Data
 print('==> Preparing data..')
 
-data_path = '/scratch/s571b087/project/Lensless_Imaging/rice_face/demosaiced_measurement_np'
-data_path_train = '/scratch/s571b087/project/Lensless_Imaging/rice_face/flatcam_split_dataset_np/train'
-data_path_test = '/scratch/s571b087/project/Lensless_Imaging/rice_face/flatcam_split_dataset_np/test'
+data_path = '/scratch/s571b087/project/Lensless_Imaging/rice_face/demosaiced_measurement_np_64'
+data_path_train = '/scratch/s571b087/project/Lensless_Imaging/rice_face/flatcam_split_dataset_np_64/train'
+data_path_test = '/scratch/s571b087/project/Lensless_Imaging/rice_face/flatcam_split_dataset_np_64/test'
 # data_path = '/home/s571b087/lensless/project/rice_face/demosaiced_measurement'
 # data_path_train = '/home/s571b087/lensless/project/rice_face/flatcam_split_dataset/train'
 # data_path_test = '/home/s571b087/lensless/project/rice_face/flatcam_split_dataset/test'
@@ -105,12 +105,12 @@ std = (0.40342093, 0.37246585, 0.3694478, 0.2515716, 0.20276384, 0.19349617, 0.2
 transform_train_np = transforms.Compose([
     # transforms.RandomHorizontalFlip(),
     transforms.ToTensor(),
-    transforms.Normalize(mean, std)
+    #transforms.Normalize(mean, std)
 ])
 
 transform_test_np = transforms.Compose([
     transforms.ToTensor(),
-    transforms.Normalize(mean, std)
+    #transforms.Normalize(mean, std)
 ])
 
 train_data = Numpy_Dataset(data_path=data_path_train, transform=transform_train_np)
@@ -124,7 +124,7 @@ trainloader = torch.utils.data.DataLoader(train_data, batch_size=args.batch_size
 testloader = torch.utils.data.DataLoader(test_data, batch_size=args.batch_size, shuffle=False, num_workers=0,
                                          sampler=None)
 lr_str = str(args.lr)
-log_path = f'np_{args.outf}_lr_{lr_str.split(".")[-1]}_bs_{args.batch_size}_attn_mode_{args.mode}'
+log_path = f'np_64_{args.outf}_lr_{lr_str.split(".")[-1]}_bs_{args.batch_size}_attn_mode_{args.mode}'
 writer = SummaryWriter(log_path)
 
 # Model

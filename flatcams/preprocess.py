@@ -11,7 +11,7 @@ import flatcam
 
 def preprocess_demosaic(data_path):
     root_dir = [x for x in os.walk(os.path.join(data_path, 'fc_captures'))]
-    root_new = os.path.join(data_path, 'demosaiced_measurement_np')
+    root_new = os.path.join(data_path, 'demosaiced_measurement_np_64')
     for sub_dir in root_dir[0][1]:
         demosaic_dir = os.path.join(root_new, sub_dir)
         if not os.path.isdir(demosaic_dir):
