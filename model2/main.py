@@ -180,8 +180,8 @@ def train(epoch):
 
         progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                      % (train_loss / (batch_idx + 1), 100. * correct / total, correct, total))
-    writer.add_scalar('train/loss', round(train_loss / len(trainloader), 2), epoch)
-    writer.add_scalar('train/accuracy', correct / len(trainloader), epoch)
+    writer.add_scalar('train/loss', round(train_loss / (batch_idx + 1), 2), epoch)
+    writer.add_scalar('train/accuracy', 100. * correct / total, epoch)
     scheduler.step()
 
 
@@ -203,8 +203,8 @@ def test(epoch):
         correct += predicted.eq(targets.data).cpu().sum()
         progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                      % (test_loss / (batch_idx + 1), 100. * correct / total, correct, total))
-    writer.add_scalar('test/accuracy', correct / len(testloader), epoch)
-    writer.add_scalar('test/loss', round(test_loss / len(testloader), 2), epoch)
+    writer.add_scalar('test/accuracy', 100. * correct / total, epoch)
+    writer.add_scalar('test/loss', round((test_loss / (batch_idx + 1)), 2), epoch)
 
     # Save checkpoint.
     acc = 100. * correct / total

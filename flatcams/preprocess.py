@@ -38,7 +38,6 @@ def tests():
     img = mpimg.imread(img_path)
     calib = loadmat('flatcam_calibdata.mat')
     dem_img = flatcam.demosaiced(img, calib) * 255
-    # mpimg.imsave('demosaiced_plt.jpg', dem_img)
     pil_image = Image.fromarray(dem_img.astype(np.uint8))
     pil_image.save('pil.png')
 
