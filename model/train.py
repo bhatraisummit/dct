@@ -132,7 +132,8 @@ def main():
     t0 = time.time()
     step = 0
     running_avg_accuracy = 0
-    log_path = f'{opt.outf}_lr_{opt.lr}_bs_{opt.batch_size}'
+    lr_str = str(opt.lr)
+    log_path = f'{opt.outf}_lr_{lr_str.split(".")[-1]}_bs_{opt.batch_size}'
     writer = SummaryWriter(log_path)
     for epoch in range(opt.epochs):
         images_disp = []
@@ -178,9 +179,9 @@ def main():
 
         # the end of each epoch: test & log
         # print('\none epoch done, saving records ...\n')
-        torch.save(model.state_dict(), os.path.join(opt.outf, 'net.pth'))
+        torch.save(model.state_dict(), os.path.join(lr_str, 'net.pth'))
         if epoch == opt.epochs / 2:
-            torch.save(model.state_dict(), os.path.join(opt.outf, 'net%d.pth' % epoch))
+            torch.save(model.state_dict(), os.path.join(lr_str, 'net%d.pth' % epoch))
         model.eval()
         total = 0
         correct = 0
