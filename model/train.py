@@ -42,6 +42,30 @@ parser.add_argument("--fft_domain", action='store_false', help='learn in FFT dom
 opt = parser.parse_args()
 
 
+def npy_loader(path):
+    sample = np.load(path)
+    return sample
+
+
+class Numpy_Dataset(torch.utils.data.Dataset):
+
+    def __init__(self, data_path='../NWPU-RESISC45/', transform=None):
+        self.dataset = torchvision.datasets.DatasetFolder(
+            root=data_path,
+            loader=npy_loader,
+            extensions='.npy'
+        )
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, idx):
+        image, label = self.dataset[idx]
+        if self.transform:
+            image = self.transform(image)
+        return image, label
+
 class NWPUDataset(torch.utils.data.Dataset):
 
     def __init__(self, data_path='../NWPU-RESISC45/', transform=None):
@@ -59,8 +83,8 @@ class NWPUDataset(torch.utils.data.Dataset):
 
 
 def testmain():
-    dummy_x = torch.randn(1, 15, 32, 32)
-    model = AttnVGG_before(im_size=32, num_classes=87,
+    dummy_x = torch.randn(1, 15, 64, 64)
+    model = AttnVGG_before(im_size=64, num_classes=87,
                            attention=not opt.no_attention, normalize_attn=opt.normalize_attn, init='xavierUniform')
     logits = model(dummy_x)  # (1,3)
     print(model)
@@ -70,8 +94,8 @@ def testmain():
 def main():
     ## load data
     data_path = '/scratch/s571b087/project/Lensless_Imaging/rice_face/demosaiced_measurement'
-    data_path_train = '/scratch/s571b087/project/Lensless_Imaging/rice_face/flatcam_split_dataset/train'
-    data_path_test = '/scratch/s571b087/project/Lensless_Imaging/rice_face/flatcam_split_dataset/test'
+    data_path_train = '/scratch/s571b087/project/Lensless_Imaging/rice_face/flatcam_split_dataset_np_64_3/train'
+    data_path_test = '/scratch/s571b087/project/Lensless_Imaging/rice_face/flatcam_split_dataset_np_64_3/test'
 
     num_aug = 1
     im_size = 32
@@ -88,8 +112,22 @@ def main():
         transforms.ToTensor()
     ])
 
-    train_data = NWPUDataset(data_path=data_path_train, transform=transform_train)
-    test_data = NWPUDataset(data_path=data_path_test, transform=transform_test)
+    transform_train_np = transforms.Compose([
+        # transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
+        # transforms.Normalize(mean, std)
+    ])
+
+    transform_test_np = transforms.Compose([
+        transforms.ToTensor(),
+        # transforms.Normalize(mean, std)
+    ])
+
+    train_data = Numpy_Dataset(data_path=data_path_train, transform=transform_train_np)
+    test_data = Numpy_Dataset(data_path=data_path_test, transform=transform_test_np)
+
+    # train_data = NWPUDataset(data_path=data_path_train, transform=transform_train)
+    # test_data = NWPUDataset(data_path=data_path_test, transform=transform_test)
 
     trainloader = torch.utils.data.DataLoader(train_data, batch_size=opt.batch_size, shuffle=True, num_workers=0,
                                               sampler=None)
