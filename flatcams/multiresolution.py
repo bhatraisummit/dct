@@ -43,6 +43,18 @@ def divide_dct(dct2_img):
     x3 = dct2_img[mid_height:height, mid_width:width]
     return x0, x1, x2, x3
 
+def join_quarters(x0, x1, x2, x3):
+    dct2_img = np.zeros((128, 128, 3))
+    height = dct2_img.shape[0]
+    width = dct2_img.shape[1]
+    mid_height = height // 2
+    mid_width = width // 2
+    dct2_img[:mid_height, :mid_width] = x0
+    dct2_img[mid_height:height, :mid_width] = x1
+    dct2_img[:mid_height, mid_width:width] = x2
+    dct2_img[mid_height:height, mid_width:width] = x3
+    return dct2_img
+
 
 # resize and then dct2
 def multiresolution_dct(dct2_img):

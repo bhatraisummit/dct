@@ -43,7 +43,6 @@ def obtain_calib_svd(calib):
 def simulate(input_im, calib):
     fc_dim = 256
     csize = calib['cSize']
-    input_im = np.resize(input_im, (256, 256, 3))
     start_y = math.floor((fc_dim - input_im.shape[0]) / 2)
     end_y = start_y + input_im.shape[0]
     start_x = math.floor((fc_dim - input_im.shape[1]) / 2)
@@ -93,8 +92,8 @@ def bayer2rgb(X_bayer, normalize=True):
     X_rgb[:, :, 1] = 0.5 * (X_bayer[:, :, 1] + X_bayer[:, :, 2])
     X_rgb[:, :, 2] = X_bayer[:, :, 3]
     # normalize to be from 0 to 1
-    # if normalize:
-    #     X_rgb = (X_rgb - X_rgb.min()) / (X_rgb.max() - X_rgb.min())
+    if normalize:
+        X_rgb = (X_rgb - X_rgb.min()) / (X_rgb.max() - X_rgb.min())
     return X_rgb
 
 
@@ -150,7 +149,7 @@ def fcrecon(cap, calib, lmbd):
 def demosaiced(sensor_measurement, calib):
     clean_calib(calib)
     bayer_measurement = fc2bayer(sensor_measurement, calib)
-    rgb = bayer2rgb(bayer_measurement, True)
+    rgb = bayer2rgb(bayer_measurement, False)
     return rgb
 
 
