@@ -44,9 +44,9 @@ def divide_dct(dct2_img):
     return x0, x1, x2, x3
 
 def join_quarters(x0, x1, x2, x3):
-    dct2_img = np.zeros((128, 128, 3))
-    height = dct2_img.shape[0]
-    width = dct2_img.shape[1]
+    height = x0.shape[0] * 2
+    width = x0.shape[1] * 2
+    dct2_img = np.zeros((height, width, 3))
     mid_height = height // 2
     mid_width = width // 2
     dct2_img[:mid_height, :mid_width] = x0
