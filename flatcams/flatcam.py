@@ -147,7 +147,6 @@ def fcrecon(cap, calib, lmbd):
 
 
 def demosaiced(sensor_measurement, calib):
-    clean_calib(calib)
     bayer_measurement = fc2bayer(sensor_measurement, calib)
     rgb = bayer2rgb(bayer_measurement, False)
     return rgb
@@ -181,21 +180,9 @@ def fc_bayer(im, calib):
     # return Y
 
 
+# Not used
 def demosaic(sensor_measurement, calib):
     clean_calib(calib)
     bayer_meas = fc_bayer(sensor_measurement, calib)
     rgb = bayer2rgb(bayer_meas, True)
     return rgb
-
-if __name__ == '__main__':
-    a = [1, 2, 3, 4, 5]
-    b = [6, 7, 8, 9, 0]
-    c = [11, 12, 13, 14, 15]
-    d = [16, 17, 18, 19, 10]
-    bayer = np.dstack([a, b, c, d])
-    print(np.array(a))
-    print(np.squeeze(bayer[:, :, 0]))
-    print(bayer[:, :, 1])
-    print(bayer[:, :, 2])
-    print(bayer[:, :, 3])
-    print(bayer.shape)
